@@ -441,3 +441,51 @@ main {
 .mobile-detail-con {
   display: none;
 }
+
+.overlay {
+  z-index: 9999;
+  width: 10rem;
+  height: 14rem;
+
+  background-color: white;
+  box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.25);
+  border-radius: 20px;
+  padding: 1rem;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  img {
+    width: 100%;
+    height: 70%;
+    border-radius: 12px;
+    object-fit: content;
+  }
+
+  div {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 0.5rem;
+  }
+
+  .service-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    font-size: 1rem;
+  }
+
+  .place-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    font-size: var(--font-size-small);
+  }
+}
