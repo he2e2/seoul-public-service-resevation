@@ -6,6 +6,12 @@ let currentPage = 1;
 let currentGroup = 1;
 let totalPages = Math.ceil(totalItems / postsPerPage);
 
+const $select = document.getElementById("search-type");
+const $input = document.getElementById("search");
+const $searchBtn = document.querySelector(".search-bar button");
+const $categories = document.querySelectorAll(".categories button");
+const $mobileCategories = document.querySelectorAll(".mobile-cate button");
+
 const createItem = (event) => {
   let statusClassName = "";
   if (event.SVCSTATNM === "접수중" || event.SVCSTATNM === "안내중")
@@ -79,17 +85,22 @@ const fetchData = async (url) => {
   return await fetch(url)
     .then((res) => res.json())
     .then((data) => {
+      if (data.RESULT) return data.RESULT.MESSAGE;
+
       data = data.ListPublicReservationEducation;
       totalItems = data.list_total_count;
       totalPages = Math.ceil(totalItems / postsPerPage);
-
-      // todo : 데이터가 없는 경우
 
       return data.row;
     });
 };
 
 const renderItem = async (data) => {
+  if (data === "해당하는 데이터가 없습니다.") {
+    window.alert(data);
+    return;
+  }
+
   const $listWrapper = document.querySelector(".list-wrapper");
   $listWrapper.innerHTML = "";
 
@@ -97,15 +108,30 @@ const renderItem = async (data) => {
   $listWrapper.innerHTML = itemHtml;
   renderPagination();
 
+  // add details
   const $lists = document.querySelectorAll(".list");
   $lists.forEach((list, index) => {
     list.addEventListener("click", async () => {
       const dataIdx = (currentPage - 1) * 10 + index + 1;
-      // 현재 카테고리 전체 & search 없는 경우에만 동작
-      // todo : 카테고리, keyword 반영
+
+      let selectedCategory = document.querySelector(".selected").textContent;
+      selectedCategory =
+        selectedCategory === "전체" ? "%20" : selectedCategory.split("/")[0];
+
+      const selectedOption = $select.value;
+      const inputValue = $input.value;
+
+      let additionalURL = "";
+      if (inputValue !== "") {
+        if (selectedOption === "service-name") additionalURL = `${inputValue}/`;
+        else if (selectedOption === "service-person")
+          additionalURL = `%20/${inputValue}/`;
+        else if (selectedOption === "region")
+          additionalURL = `%20/%20/${inputValue}/`;
+      }
 
       const data = await fetchData(
-        `http://openapi.seoul.go.kr:8088/735a4d656177686734374978656774/json/ListPublicReservationEducation/${dataIdx}/${dataIdx}/`
+        `http://openapi.seoul.go.kr:8088/735a4d656177686734374978656774/json/ListPublicReservationEducation/${dataIdx}/${dataIdx}/${selectedCategory}/${additionalURL}`
       );
 
       document.querySelector(".mobile-detail-con").classList.toggle("active");
@@ -147,8 +173,17 @@ const renderPagination = () => {
     pageButton.className = i === currentPage ? "on" : "";
     pageButton.addEventListener("click", async () => {
       currentPage = i;
-      // todo : search data도 유지하도록 수정
-      const data = await fetchData(createURL((currentPage - 1) * 10 + 1));
+
+      const selectedOption = $select.value;
+      const inputValue = $input.value;
+
+      const data =
+        inputValue === ""
+          ? await fetchData(createURL((currentPage - 1) * 10 + 1))
+          : await fetchData(
+              createURL((currentPage - 1) * 10 + 1, selectedOption, inputValue)
+            );
+
       renderItem(data);
       renderPagination();
     });
@@ -165,12 +200,6 @@ const renderPagination = () => {
     $pagination.appendChild(nextGroupButton);
   }
 };
-
-const $select = document.getElementById("search-type");
-const $input = document.getElementById("search");
-const $searchBtn = document.querySelector(".search-bar button");
-const $categories = document.querySelectorAll(".categories button");
-const $mobileCategories = document.querySelectorAll(".mobile-cate button");
 
 const searchKeywords = async () => {
   const selectedOption = $select.value;
@@ -200,7 +229,6 @@ $categories.forEach((category, index) => {
   });
 });
 
-// todo : 모바일 카테고리 선택하면 창 없애기
 $mobileCategories.forEach((category, index) => {
   category.addEventListener("click", () => {
     $categories.forEach((cat) => cat.classList.remove("selected"));
@@ -209,8 +237,24 @@ $mobileCategories.forEach((category, index) => {
     category.classList.add("selected");
     $categories[index].classList.add("selected");
     searchCategory();
+
+    document.querySelector(".mobile-cate").classList.toggle("active");
   });
 });
+
+document.querySelector(".hamburger").addEventListener("click", () => {
+  document.querySelector(".mobile-cate").classList.toggle("active");
+});
+
+document.querySelector(".mobile-cate .fa-x").addEventListener("click", () => {
+  document.querySelector(".mobile-cate").classList.toggle("active");
+});
+
+document
+  .querySelector(".mobile-detail-con .fa-x")
+  .addEventListener("click", () => {
+    document.querySelector(".mobile-detail-con").classList.toggle("active");
+  });
 
 const init = async () => {
   const data = await fetchData(createURL());
