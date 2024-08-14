@@ -1,15 +1,24 @@
-let totalItems;
 const postsPerPage = 10;
 const pagesPerGroup = 5;
 
+let totalItems;
 let currentPage = 1;
 let currentGroup = 1;
 let totalPages = Math.ceil(totalItems / postsPerPage);
 
 const createItem = (event) => {
+  let statusClassName = "";
+  if (event.SVCSTATNM === "접수중" || event.SVCSTATNM === "안내중")
+    statusClassName = "blue";
+  else if (event.SVCSTATNM === "예약일시중지") statusClassName = "red";
+  else if (event.SVCSTATNM === "접수종료" || event.SVCSTATNM === "예약마감")
+    statusClassName = "gray";
+
   return `
     <div class="list">
-        <div class="status blue">${event.SVCSTATNM}</div>
+        <div class="status ${statusClassName}">${
+    event.SVCSTATNM === "예약일시중지" ? "일시중지" : event.SVCSTATNM
+  }</div>
         <img
         class="thumbnail"
         src=${event.IMGURL}
@@ -67,6 +76,27 @@ const renderItem = async (start = 1) => {
   const itemHtml = data.map((row) => createItem(row)).join("");
   $listWrapper.innerHTML = itemHtml;
   renderPagination();
+
+  const $lists = document.querySelectorAll(".list");
+  $lists.forEach((list, index) => {
+    list.addEventListener("click", async () => {
+      const dataIdx = (currentPage - 1) * 10 + index + 1;
+      const data = await fetchData(
+        `http://openapi.seoul.go.kr:8088/735a4d656177686734374978656774/json/ListPublicReservationEducation/${dataIdx}/${dataIdx}/`
+      );
+
+      document.querySelector(".mobile-detail-con").classList.toggle("active");
+
+      document.querySelector(".map").style.height = "calc(100% - 40rem)";
+      document.querySelector(".details").style.display = "flex";
+
+      const $contentsCons = document.querySelectorAll(".contents");
+
+      $contentsCons.forEach((con) => {
+        con.innerHTML = data[0].DTLCONT.replace(/<img[^>]*>/g, "");
+      });
+    });
+  });
 };
 
 const renderPagination = () => {
@@ -111,12 +141,8 @@ const renderPagination = () => {
   }
 };
 
-const renderDetails = () => {
-  // todo
-};
-
 const init = async () => {
   renderItem();
 };
 
-// init();
+init();

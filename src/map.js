@@ -1,14 +1,5 @@
 const $map = document.querySelector(".map");
 
-document.querySelectorAll(".list").forEach((list) => {
-  list.addEventListener("click", () => {
-    document.querySelector(".mobile-detail-con").classList.toggle("active");
-
-    $map.style.height = "calc(100% - 30rem)";
-    document.querySelector(".details").style.display = "flex";
-  });
-});
-
 document
   .querySelector(".mobile-detail-con .fa-x")
   .addEventListener("click", () => {
