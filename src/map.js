@@ -48,10 +48,6 @@ const createMarker = (places, map, type) => {
         if (!isVisible) customOverlay.setMap(map);
         else customOverlay.setMap(null);
       });
-
-      kakao.maps.event.addListener(customOverlay, "click", () => {
-        customOverlay.setMap(null);
-      });
     }
   }
 };
