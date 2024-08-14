@@ -52,6 +52,28 @@ const createItem = (event) => {
     `;
 };
 
+const createURL = (start = 1, option = "%20", keywords = "%20") => {
+  let selectedCategory = document.querySelector(".selected").textContent;
+  selectedCategory = selectedCategory === "전체" ? "%20" : selectedCategory;
+
+  if (option === "service-name")
+    return `http://openapi.seoul.go.kr:8088/735a4d656177686734374978656774/json/ListPublicReservationEducation/${start}/${
+      start + 9
+    }/${selectedCategory}/${keywords}`;
+  else if (option === "service-person")
+    return `http://openapi.seoul.go.kr:8088/735a4d656177686734374978656774/json/ListPublicReservationEducation/${start}/${
+      start + 9
+    }/${selectedCategory}/%20/${keywords}`;
+  else if (option === "region")
+    return `http://openapi.seoul.go.kr:8088/735a4d656177686734374978656774/json/ListPublicReservationEducation/${start}/${
+      start + 9
+    }/${selectedCategory}/%20/%20/${keywords}`;
+  else
+    return `http://openapi.seoul.go.kr:8088/735a4d656177686734374978656774/json/ListPublicReservationEducation/${start}/${
+      start + 9
+    }/${selectedCategory}`;
+};
+
 const fetchData = async (url) => {
   return await fetch(url)
     .then((res) => res.json())
@@ -64,14 +86,9 @@ const fetchData = async (url) => {
     });
 };
 
-const renderItem = async (start = 1) => {
+const renderItem = async (data) => {
   const $listWrapper = document.querySelector(".list-wrapper");
   $listWrapper.innerHTML = "";
-  const data = await fetchData(
-    `http://openapi.seoul.go.kr:8088/735a4d656177686734374978656774/json/ListPublicReservationEducation/${start}/${
-      start + 9
-    }/`
-  );
 
   const itemHtml = data.map((row) => createItem(row)).join("");
   $listWrapper.innerHTML = itemHtml;
@@ -81,6 +98,9 @@ const renderItem = async (start = 1) => {
   $lists.forEach((list, index) => {
     list.addEventListener("click", async () => {
       const dataIdx = (currentPage - 1) * 10 + index + 1;
+      // 현재 카테고리 전체 & search 없는 경우에만 동작
+      // todo : 카테고리, keyword 반영
+
       const data = await fetchData(
         `http://openapi.seoul.go.kr:8088/735a4d656177686734374978656774/json/ListPublicReservationEducation/${dataIdx}/${dataIdx}/`
       );
@@ -122,9 +142,10 @@ const renderPagination = () => {
     const pageButton = document.createElement("button");
     pageButton.textContent = i;
     pageButton.className = i === currentPage ? "on" : "";
-    pageButton.addEventListener("click", () => {
+    pageButton.addEventListener("click", async () => {
       currentPage = i;
-      renderItem((currentPage - 1) * 10 + 1);
+      const data = await fetchData(createURL((currentPage - 1) * 10 + 1));
+      renderItem(data);
       renderPagination();
     });
     $pagination.appendChild(pageButton);
@@ -141,8 +162,26 @@ const renderPagination = () => {
   }
 };
 
-const init = async () => {
-  renderItem();
+const $select = document.getElementById("search-type");
+const $input = document.getElementById("search");
+const $searchBtn = document.querySelector(".search-bar button");
+
+const searchKeywords = async () => {
+  // select에서 선택된 option으로 검색 내용받아서 data fetch -> rendering
+
+  const selectedOption = $select.value;
+  const inputValue = $input.value;
 };
 
-init();
+const searchCategory = (category) => {
+  // 선택된 category에 맞는 data fetch -> rendering, category button active
+};
+
+$searchBtn.addEventListener("click", () => searchKeywords);
+
+const init = async () => {
+  const data = await fetchData(createURL());
+  renderItem(data);
+};
+
+// init();
