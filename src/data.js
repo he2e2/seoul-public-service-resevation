@@ -54,7 +54,8 @@ const createItem = (event) => {
 
 const createURL = (start = 1, option = "%20", keywords = "%20") => {
   let selectedCategory = document.querySelector(".selected").textContent;
-  selectedCategory = selectedCategory === "전체" ? "%20" : selectedCategory;
+  selectedCategory =
+    selectedCategory === "전체" ? "%20" : selectedCategory.split("/")[0];
 
   if (option === "service-name")
     return `http://openapi.seoul.go.kr:8088/735a4d656177686734374978656774/json/ListPublicReservationEducation/${start}/${
@@ -81,6 +82,8 @@ const fetchData = async (url) => {
       data = data.ListPublicReservationEducation;
       totalItems = data.list_total_count;
       totalPages = Math.ceil(totalItems / postsPerPage);
+
+      // todo : 데이터가 없는 경우
 
       return data.row;
     });
@@ -144,6 +147,7 @@ const renderPagination = () => {
     pageButton.className = i === currentPage ? "on" : "";
     pageButton.addEventListener("click", async () => {
       currentPage = i;
+      // todo : search data도 유지하도록 수정
       const data = await fetchData(createURL((currentPage - 1) * 10 + 1));
       renderItem(data);
       renderPagination();
@@ -165,19 +169,48 @@ const renderPagination = () => {
 const $select = document.getElementById("search-type");
 const $input = document.getElementById("search");
 const $searchBtn = document.querySelector(".search-bar button");
+const $categories = document.querySelectorAll(".categories button");
+const $mobileCategories = document.querySelectorAll(".mobile-cate button");
 
 const searchKeywords = async () => {
-  // select에서 선택된 option으로 검색 내용받아서 data fetch -> rendering
-
   const selectedOption = $select.value;
   const inputValue = $input.value;
+
+  const data = await fetchData(createURL(1, selectedOption, inputValue));
+  renderItem(data);
 };
 
-const searchCategory = (category) => {
-  // 선택된 category에 맞는 data fetch -> rendering, category button active
+const searchCategory = async () => {
+  const data = await fetchData(createURL());
+  renderItem(data);
 };
 
-$searchBtn.addEventListener("click", () => searchKeywords);
+$searchBtn.addEventListener("click", () => {
+  searchKeywords();
+});
+
+$categories.forEach((category, index) => {
+  category.addEventListener("click", () => {
+    $categories.forEach((cat) => cat.classList.remove("selected"));
+    $mobileCategories.forEach((cat) => cat.classList.remove("selected"));
+
+    category.classList.add("selected");
+    $mobileCategories[index].classList.add("selected");
+    searchCategory();
+  });
+});
+
+// todo : 모바일 카테고리 선택하면 창 없애기
+$mobileCategories.forEach((category, index) => {
+  category.addEventListener("click", () => {
+    $categories.forEach((cat) => cat.classList.remove("selected"));
+    $mobileCategories.forEach((cat) => cat.classList.remove("selected"));
+
+    category.classList.add("selected");
+    $categories[index].classList.add("selected");
+    searchCategory();
+  });
+});
 
 const init = async () => {
   const data = await fetchData(createURL());
