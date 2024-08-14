@@ -1,22 +1,53 @@
-// const $map = document.querySelector(".map");
+export const renderingMap = (element, places, type) => {
+  let mapOption = {
+    center: new kakao.maps.LatLng(37.5665, 126.978),
+    level: 8,
+  };
 
-// document
-//   .querySelector(".mobile-detail-con .fa-x")
-//   .addEventListener("click", () => {
-//     document.querySelector(".mobile-detail-con").classList.toggle("active");
-//   });
+  let map = new kakao.maps.Map(element, mapOption);
+  createMarker(places, map, type);
+};
 
-// var mapOption = {
-//   center: new kakao.maps.LatLng(37.5665, 126.978),
-//   level: 8,
-// };
+const createMarker = (places, map, type) => {
+  let imageSrc = "../img/marker.svg";
 
-// var map = new kakao.maps.Map($map, mapOption);
+  for (let i = 0; i < places.length; i++) {
+    let imageSize = new kakao.maps.Size(40, 40);
+    let imageOffset = new kakao.maps.Point(20, 40);
+    let markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, {
+      offset: imageOffset,
+    });
 
-// var markerPosition = new kakao.maps.LatLng(37.5665, 126.978);
+    let marker = new kakao.maps.Marker({
+      map: map,
+      position: new kakao.maps.LatLng(places[i].Y, places[i].X),
+      title: places[i].PLACENM,
+      image: markerImage,
+    });
 
-// var marker = new kakao.maps.Marker({
-//   position: markerPosition,
-// });
+    if (type === "detail") {
+      let content = `
+        <div class="overlay">
+            <img src="${places[i].IMGURL}" alt="thumbnail" />
+            <div>
+                <p class="service-name">${places[i].SVCNM}</p>
+                <span class="place-name">${places[i].PLACENM}</span>
+            </div>
+        </div>
+    `;
 
-// marker.setMap(map);
+      let customOverlay = new kakao.maps.CustomOverlay({
+        position: new kakao.maps.LatLng(places[i].Y, places[i].X),
+        content: content,
+        yAnchor: 1,
+      });
+
+      let isVisible = false;
+
+      kakao.maps.event.addListener(marker, "click", () => {
+        if (!isVisible) customOverlay.setMap(map);
+        else customOverlay.setMap(null);
+      });
+    }
+  }
+};
