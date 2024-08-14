@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+      integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="main.css" />
+    <link rel="stylesheet" href="mobile.css" />
+    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=52763625db8f0825cf5004bf0c7e5314"></script>
+    <script src="book.js" defer></script>
+    <script src="map.js" defer></script>
+    <script src="data.js" defer></script>
+    <title>서울특별시 공공서비스 예약</title>
+  </head>
+  <body>
+    <header>
+      <h1></h1>
+      <button class="hamburger"></button>
+      <nav class="categories">
+        <button class="category on">전체</button>
+        <button class="category">공예/취미</button
+        ><button class="category">교양/어학</button>
+        <button class="category">도시/농업</button
+        ><button class="category">미술/제작</button>
+        <button class="category">스포츠</button
+        ><button class="category">역사</button>
+        <button class="category">자연과학</button
+        ><button class="category">전문자격증</button>
+        <button class="category">정보/통신</button
+        ><button class="category">청년/정보</button>
+        <button class="category">기타</button>
+      </nav>
+      <div class="mobile-cate">
+        <i class="fa-solid fa-x"></i>
+        <button class="category on">전체</button>
+        <button class="category">공예/취미</button
+        ><button class="category">교양/어학</button>
+        <button class="category">도시/농업</button
+        ><button class="category">미술/제작</button>
+        <button class="category">스포츠</button
+        ><button class="category">역사</button>
+        <button class="category">자연과학</button
+        ><button class="category">전문자격증</button>
+        <button class="category">정보/통신</button
+        ><button class="category">청년/정보</button>
+        <button class="category">기타</button>
+      </div>
+    </header>
+    <main>
+      <section class="left">
+        <div class="top-con">
+          <h2 class="mobile-h2">
+            서울특별시
+            <span class="text-blue">공공서비스</span> 예약<br />이용하시려는
+            서비스를 빠르게 예약해보세요
+          </h2>
+          <div class="search-bar">
+            <select id="search-type" name="types">
+              <option value="legion">지역명</option>
+              <option value="service-name">서비스명</option>
+              <option value="service-person">서비스대상</option>
+            </select>
+            <input type="text" placeholder="검색어를 입력하세요" id="search" />
+            <button><i class="fa-solid fa-magnifying-glass"></i></button>
+          </div>
+        </div>
+        <div class="result-list">
+          <div class="list-wrapper"></div>
+          <div class="pagination">
+            <i class="fa-solid fa-chevron-left"></i>
+            <div class="page">
+              <button class="on">1</button>
+              <button>2</button>
+              <button>3</button>
+            </div>
+            <i class="fa-solid fa-chevron-right"></i>
+          </div>
+        </div>
+      </section>
+      <section class="right">
+        <div class="top-con">
+          <h2>
+            서울특별시
+            <span class="text-blue">공공서비스</span> 예약<br />이용하시려는
+            서비스를 빠르게 예약해보세요
+          </h2>
+        </div>
+        <div class="map"></div>
+        <div class="details">
+          <div class="detail-description">
+            <div class="contents">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae
+              exercitationem maiores aperiam, minus facilis cupiditate illum
+              corrupti, ex dolorem eaque vel! Sunt id natus voluptas praesentium
+              et quasi veniam numquam?Lorem ipsum dolor sit amet consectetur
+              adipisicing elit. Quae exercitationem maiores aperiam, minus
+              facilis cupiditate illum corrupti, ex dolorem eaque vel! Sunt id
+              natus voluptas praesentium et quasi veniam numquam?Lorem ipsum
+              dolor sit amet consectetur adipisicing elit. Quae exercitationem
+              maiores aperiam, minus facilis cupiditate illum corrupti, ex
+              dolorem eaque vel! Sunt id natus voluptas praesentium et quasi
+              veniam numquam?Lorem ipsum dolor sit amet consectetur adipisicing
+              elit. Quae exercitationem maiores aperiam, minus facilis
+              cupiditate illum corrupti, ex dolorem eaque vel! Sunt id natus
+              voluptas praesentium et quasi veniam numquam?
+            </div>
+          </div>
+          <button class="reservation">예약하러가기</button>
+        </div>
+      </section>
+      <div class="mobile-detail-con">
+        <i class="fa-solid fa-x"></i>
+        <div class="mobile-map"></div>
+        <div class="detail-description">
+          <div class="contents">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae
+            exercitationem maiores aperiam, minus facilis cupiditate illum
+            corrupti, ex dolorem eaque vel! Sunt id natus voluptas praesentium
+            et quasi veniam numquam?Lorem ipsum dolor sit amet consectetur
+            adipisicing elit. Quae exercitationem maiores aperiam, minus facilis
+            cupiditate illum corrupti, ex dolorem eaque vel! Sunt id natus
+            voluptas praesentium et quasi veniam numquam?Lorem ipsum dolor sit
+            amet consectetur adipisicing elit. Quae exercitationem maiores
+            aperiam, minus facilis cupiditate illum corrupti, ex dolorem eaque
+            vel! Sunt id natus voluptas praesentium et quasi veniam
+            numquam?Lorem ipsum dolor sit amet consectetur adipisicing elit.
+            Quae exercitationem maiores aperiam, minus facilis cupiditate illum
+            corrupti, ex dolorem eaque vel! Sunt id natus voluptas praesentium
+            et quasi veniam numquam?aperiam, minus facilis cupiditate illum
+            corrupti, ex dolorem eaque vel! Sunt id natus voluptas praesentium
+            et quasi veniam numquam?Lorem ipsum dolor sit amet consectetur
+            adipisicing elit. Quae exercitationem maiores aperiam, minus facilis
+            cupiditate illum corrupti, ex dolorem eaque vel! Sunt id natus
+            voluptas praesentium et quasi veniam numquam?
+          </div>
+        </div>
+        <button class="reservation">예약하러가기</button>
+      </div>
+    </main>
+  </body>
+</html>
