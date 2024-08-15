@@ -1,53 +1,60 @@
-export const renderingMap = (element, places, type) => {
-  let mapOption = {
+export const renderingMap = (element, places) => {
+  const mapOption = {
     center: new kakao.maps.LatLng(37.5665, 126.978),
     level: 8,
   };
 
-  let map = new kakao.maps.Map(element, mapOption);
-  createMarker(places, map, type);
+  const map = new kakao.maps.Map(element, mapOption);
+  createMarker(places, map, "main");
+};
+
+export const renderingDetailMap = (element, place) => {
+  const mapOption = {
+    center: new kakao.maps.LatLng(place[0].Y, place[0].X),
+    level: 3,
+  };
+
+  const map = new kakao.maps.Map(element, mapOption);
+  createMarker(place, map, "detail");
 };
 
 const createMarker = (places, map, type) => {
-  let imageSrc = "../img/marker.svg";
+  const imageSrc = "../img/marker.svg";
 
-  for (let i = 0; i < places.length; i++) {
-    let imageSize = new kakao.maps.Size(40, 40);
-    let imageOffset = new kakao.maps.Point(20, 40);
-    let markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, {
+  places.map((place) => {
+    const imageSize = new kakao.maps.Size(40, 40);
+    const imageOffset = new kakao.maps.Point(20, 40);
+    const markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, {
       offset: imageOffset,
     });
 
-    let marker = new kakao.maps.Marker({
+    const marker = new kakao.maps.Marker({
       map: map,
-      position: new kakao.maps.LatLng(places[i].Y, places[i].X),
-      title: places[i].PLACENM,
+      position: new kakao.maps.LatLng(place.Y, place.X),
+      title: place.PLACENM,
       image: markerImage,
     });
 
     if (type === "detail") {
-      let content = `
+      const mapLink = `https://map.kakao.com/link/map/${place.Y},${place.X}`;
+      const content = `
         <div class="overlay">
-            <img src="${places[i].IMGURL}" alt="thumbnail" />
+          <a href="${mapLink}" target="_blank">
+            <img src="${place.IMGURL}" alt="thumbnail" />
             <div>
-                <p class="service-name">${places[i].SVCNM}</p>
-                <span class="place-name">${places[i].PLACENM}</span>
+                <p class="service-name">${place.SVCNM}</p>
+                <span class="place-name">${place.PLACENM}</span>
             </div>
+          </a>
         </div>
     `;
 
-      let customOverlay = new kakao.maps.CustomOverlay({
-        position: new kakao.maps.LatLng(places[i].Y, places[i].X),
+      const customOverlay = new kakao.maps.CustomOverlay({
+        position: new kakao.maps.LatLng(place.Y, place.X),
         content: content,
         yAnchor: 1,
       });
-
-      let isVisible = false;
-
-      kakao.maps.event.addListener(marker, "click", () => {
-        if (!isVisible) customOverlay.setMap(map);
-        else customOverlay.setMap(null);
-      });
+      customOverlay.setMap(map);
     }
-  }
+  });
 };
