@@ -238,7 +238,7 @@ main {
   .thumbnail {
     width: 45%;
     height: 10rem;
-    object-fit: content;
+    object-fit: cover;
     border-radius: 15px;
   }
 
