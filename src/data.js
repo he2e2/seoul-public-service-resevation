@@ -1,4 +1,4 @@
-import { renderingMap } from "./map.js";
+import { renderingMap, renderingDetailMap } from "./map.js";
 
 const postsPerPage = 10;
 const pagesPerGroup = 5;
@@ -136,8 +136,8 @@ const renderItem = async (data) => {
         `http://openapi.seoul.go.kr:8088/735a4d656177686734374978656774/json/ListPublicReservationEducation/${dataIdx}/${dataIdx}/${selectedCategory}/${additionalURL}`
       );
 
-      renderingMap(document.querySelector(".map"), data, "detail");
-      renderingMap(document.querySelector(".mobile-map"), data, "detail");
+      renderingDetailMap(document.querySelector(".map"), data);
+      renderingDetailMap(document.querySelector(".mobile-map"), data);
 
       document.querySelector(".mobile-detail-con").classList.toggle("active");
 
@@ -190,7 +190,7 @@ const renderPagination = () => {
             );
 
       renderItem(data);
-      renderingMap(document.querySelector(".map"), data, "main");
+      renderingMap(document.querySelector(".map"), data);
       renderPagination();
     });
     $pagination.appendChild(pageButton);
@@ -213,13 +213,13 @@ const searchKeywords = async () => {
 
   const data = await fetchData(createURL(1, selectedOption, inputValue));
   renderItem(data);
-  renderingMap(document.querySelector(".map"), data, "main");
+  renderingMap(document.querySelector(".map"), data);
 };
 
 const searchCategory = async () => {
   const data = await fetchData(createURL());
   renderItem(data);
-  renderingMap(document.querySelector(".map"), data, "main");
+  renderingMap(document.querySelector(".map"), data);
 };
 
 $searchBtn.addEventListener("click", () => {
@@ -267,7 +267,7 @@ document
 const init = async () => {
   const data = await fetchData(createURL());
   renderItem(data);
-  renderingMap(document.querySelector(".map"), data, "main");
+  renderingMap(document.querySelector(".map"), data);
 };
 
 init();
