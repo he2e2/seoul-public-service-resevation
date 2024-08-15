@@ -1,4 +1,6 @@
-import { renderingMap } from "./map.js";
+import { renderingMap, renderingDetailMap } from "./map.js";
+
+const apiKey = import.meta.env.VITE_API_KEY;
 
 const postsPerPage = 10;
 const pagesPerGroup = 5;
@@ -66,19 +68,19 @@ const createURL = (start = 1, option = "%20", keywords = "%20") => {
     selectedCategory === "전체" ? "%20" : selectedCategory.split("/")[0];
 
   if (option === "service-name")
-    return `http://openapi.seoul.go.kr:8088/735a4d656177686734374978656774/json/ListPublicReservationEducation/${start}/${
+    return `http://openapi.seoul.go.kr:8088/${apiKey}/json/ListPublicReservationEducation/${start}/${
       start + 9
     }/${selectedCategory}/${keywords}`;
   else if (option === "service-person")
-    return `http://openapi.seoul.go.kr:8088/735a4d656177686734374978656774/json/ListPublicReservationEducation/${start}/${
+    return `http://openapi.seoul.go.kr:8088/${apiKey}/json/ListPublicReservationEducation/${start}/${
       start + 9
     }/${selectedCategory}/%20/${keywords}`;
   else if (option === "region")
-    return `http://openapi.seoul.go.kr:8088/735a4d656177686734374978656774/json/ListPublicReservationEducation/${start}/${
+    return `http://openapi.seoul.go.kr:8088/${apiKey}/json/ListPublicReservationEducation/${start}/${
       start + 9
     }/${selectedCategory}/%20/%20/${keywords}`;
   else
-    return `http://openapi.seoul.go.kr:8088/735a4d656177686734374978656774/json/ListPublicReservationEducation/${start}/${
+    return `http://openapi.seoul.go.kr:8088/${apiKey}/json/ListPublicReservationEducation/${start}/${
       start + 9
     }/${selectedCategory}`;
 };
@@ -133,16 +135,21 @@ const renderItem = async (data) => {
       }
 
       const data = await fetchData(
-        `http://openapi.seoul.go.kr:8088/735a4d656177686734374978656774/json/ListPublicReservationEducation/${dataIdx}/${dataIdx}/${selectedCategory}/${additionalURL}`
+        `http://openapi.seoul.go.kr:8088/${apiKey}/json/ListPublicReservationEducation/${dataIdx}/${dataIdx}/${selectedCategory}/${additionalURL}`
       );
 
-      renderingMap(document.querySelector(".map"), data, "detail");
-      renderingMap(document.querySelector(".mobile-map"), data, "detail");
+      renderingDetailMap(document.querySelector(".map"), data);
+      renderingDetailMap(document.querySelector(".mobile-map"), data);
 
       document.querySelector(".mobile-detail-con").classList.toggle("active");
 
       document.querySelector(".map").style.height = "calc(100% - 40rem)";
       document.querySelector(".details").style.display = "flex";
+
+      const $reservationBtn = document.querySelectorAll(".reservation");
+      $reservationBtn.forEach((r) => {
+        r.href = data[0].SVCURL;
+      });
 
       const $contentsCons = document.querySelectorAll(".contents");
 
@@ -190,7 +197,7 @@ const renderPagination = () => {
             );
 
       renderItem(data);
-      renderingMap(document.querySelector(".map"), data, "main");
+      renderingMap(document.querySelector(".map"), data);
       renderPagination();
     });
     $pagination.appendChild(pageButton);
@@ -213,17 +220,23 @@ const searchKeywords = async () => {
 
   const data = await fetchData(createURL(1, selectedOption, inputValue));
   renderItem(data);
-  renderingMap(document.querySelector(".map"), data, "main");
+  renderingMap(document.querySelector(".map"), data);
 };
 
 const searchCategory = async () => {
   const data = await fetchData(createURL());
   renderItem(data);
-  renderingMap(document.querySelector(".map"), data, "main");
+  renderingMap(document.querySelector(".map"), data);
 };
 
 $searchBtn.addEventListener("click", () => {
   searchKeywords();
+});
+
+document.getElementById("search").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" || e.keyCode === 13) {
+    searchKeywords();
+  }
 });
 
 $categories.forEach((category, index) => {
@@ -267,7 +280,7 @@ document
 const init = async () => {
   const data = await fetchData(createURL());
   renderItem(data);
-  renderingMap(document.querySelector(".map"), data, "main");
+  renderingMap(document.querySelector(".map"), data);
 };
 
 init();

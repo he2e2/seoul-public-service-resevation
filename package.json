@@ -1,0 +1,14 @@
+{
+  "name": "seoul-public-service-resevation",
+  "version": "1.0.0",
+  "description": "\"# seoul-public-service-resevation\"",
+  "main": "vite.config.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
