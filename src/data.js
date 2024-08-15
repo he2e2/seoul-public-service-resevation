@@ -144,6 +144,11 @@ const renderItem = async (data) => {
       document.querySelector(".map").style.height = "calc(100% - 40rem)";
       document.querySelector(".details").style.display = "flex";
 
+      const $reservationBtn = document.querySelectorAll(".reservation");
+      $reservationBtn.forEach((r) => {
+        r.href = data[0].SVCURL;
+      });
+
       const $contentsCons = document.querySelectorAll(".contents");
 
       $contentsCons.forEach((con) => {
