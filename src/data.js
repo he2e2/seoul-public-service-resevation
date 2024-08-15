@@ -226,6 +226,12 @@ $searchBtn.addEventListener("click", () => {
   searchKeywords();
 });
 
+document.getElementById("search").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" || e.keyCode === 13) {
+    searchKeywords();
+  }
+});
+
 $categories.forEach((category, index) => {
   category.addEventListener("click", () => {
     $categories.forEach((cat) => cat.classList.remove("selected"));
