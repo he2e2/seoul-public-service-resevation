@@ -1,5 +1,7 @@
 import { renderingMap, renderingDetailMap } from "./map.js";
 
+const apiKey = import.meta.env.VITE_API_KEY;
+
 const postsPerPage = 10;
 const pagesPerGroup = 5;
 
@@ -66,19 +68,19 @@ const createURL = (start = 1, option = "%20", keywords = "%20") => {
     selectedCategory === "전체" ? "%20" : selectedCategory.split("/")[0];
 
   if (option === "service-name")
-    return `http://openapi.seoul.go.kr:8088/735a4d656177686734374978656774/json/ListPublicReservationEducation/${start}/${
+    return `http://openapi.seoul.go.kr:8088/${apiKey}/json/ListPublicReservationEducation/${start}/${
       start + 9
     }/${selectedCategory}/${keywords}`;
   else if (option === "service-person")
-    return `http://openapi.seoul.go.kr:8088/735a4d656177686734374978656774/json/ListPublicReservationEducation/${start}/${
+    return `http://openapi.seoul.go.kr:8088/${apiKey}/json/ListPublicReservationEducation/${start}/${
       start + 9
     }/${selectedCategory}/%20/${keywords}`;
   else if (option === "region")
-    return `http://openapi.seoul.go.kr:8088/735a4d656177686734374978656774/json/ListPublicReservationEducation/${start}/${
+    return `http://openapi.seoul.go.kr:8088/${apiKey}/json/ListPublicReservationEducation/${start}/${
       start + 9
     }/${selectedCategory}/%20/%20/${keywords}`;
   else
-    return `http://openapi.seoul.go.kr:8088/735a4d656177686734374978656774/json/ListPublicReservationEducation/${start}/${
+    return `http://openapi.seoul.go.kr:8088/${apiKey}/json/ListPublicReservationEducation/${start}/${
       start + 9
     }/${selectedCategory}`;
 };
@@ -133,7 +135,7 @@ const renderItem = async (data) => {
       }
 
       const data = await fetchData(
-        `http://openapi.seoul.go.kr:8088/735a4d656177686734374978656774/json/ListPublicReservationEducation/${dataIdx}/${dataIdx}/${selectedCategory}/${additionalURL}`
+        `http://openapi.seoul.go.kr:8088/${apiKey}/json/ListPublicReservationEducation/${dataIdx}/${dataIdx}/${selectedCategory}/${additionalURL}`
       );
 
       renderingDetailMap(document.querySelector(".map"), data);
