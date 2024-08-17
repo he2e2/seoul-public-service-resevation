@@ -19,7 +19,7 @@ export const renderingDetailMap = (element, place) => {
 };
 
 const createMarker = (places, map, type) => {
-  const imageSrc = "../img/marker.svg";
+  const imageSrc = "src/assets/img/marker.svg";
 
   places.map((place) => {
     const imageSize = new kakao.maps.Size(40, 40);

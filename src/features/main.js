@@ -40,18 +40,18 @@ const createItem = (event) => {
         </h3>
         <div>
             <li class="item">
-            <img src="../img/user.svg" alt="user-icon" />
+            <img src="src/assets/img/user.svg" alt="user-icon" />
             <p class="years">${event.USETGTINFO}</p>
             </li>
             <li class="item">
-            <img src="../img/pin.svg" alt="pin-icon" /><span
+            <img src="src/assets/img/pin.svg" alt="pin-icon" /><span
                 class="period"
                 >${event.SVCOPNBGNDT.split(" ")[0]} ~ ${
     event.SVCOPNENDDT.split(" ")[0]
   }</span>
             </li>
             <li class="item">
-            <img src="../img/calendar.svg" alt="calendar-icon" /><span
+            <img src="src/assets/img/calendar.svg" alt="calendar-icon" /><span
                 class="place"
                 >${event.PLACENM}</span
             >
@@ -116,7 +116,7 @@ const renderItem = async (data) => {
   const $lists = document.querySelectorAll(".list");
   $lists.forEach((list, index) => {
     list.addEventListener("click", async () => {
-      const dataIdx = (currentPage - 1) * 10 + index + 1;
+      const dataIdx = (currentPage - 1) * postsPerPage + index + 1;
 
       let selectedCategory = document.querySelector(".selected").textContent;
       selectedCategory =
@@ -138,13 +138,13 @@ const renderItem = async (data) => {
         `http://openapi.seoul.go.kr:8088/${apiKey}/json/ListPublicReservationEducation/${dataIdx}/${dataIdx}/${selectedCategory}/${additionalURL}`
       );
 
-      renderingDetailMap(document.querySelector(".map"), data);
-      renderingDetailMap(document.querySelector(".mobile-map"), data);
-
       document.querySelector(".mobile-detail-con").classList.toggle("active");
 
-      document.querySelector(".map").style.height = "calc(100% - 40rem)";
+      document.querySelector(".map").style.height = "calc(100% - 25rem)";
       document.querySelector(".details").style.display = "flex";
+
+      renderingDetailMap(document.querySelector(".map"), data);
+      renderingDetailMap(document.querySelector(".mobile-map"), data);
 
       const $reservationBtn = document.querySelectorAll(".reservation");
       $reservationBtn.forEach((r) => {
@@ -160,8 +160,27 @@ const renderItem = async (data) => {
   });
 };
 
+const renderForPagination = async (currentPage) => {
+  const selectedOption = $select.value;
+  const inputValue = $input.value;
+
+  const data =
+    inputValue === ""
+      ? await fetchData(createURL((currentPage - 1) * postsPerPage + 1))
+      : await fetchData(
+          createURL(
+            (currentPage - 1) * postsPerPage + 1,
+            selectedOption,
+            inputValue
+          )
+        );
+
+  renderItem(data);
+  renderingMap(document.querySelector(".map"), data);
+};
+
 const renderPagination = () => {
-  if (totalItems <= 10) return;
+  if (totalItems <= postsPerPage) return;
 
   const $pagination = document.querySelector(".pagination");
   $pagination.innerHTML = "";
@@ -174,6 +193,9 @@ const renderPagination = () => {
     prevGroupButton.className = "fa-solid fa-chevron-left";
     prevGroupButton.addEventListener("click", () => {
       currentGroup--;
+      currentPage = currentGroup * pagesPerGroup;
+
+      renderForPagination(currentPage);
       renderPagination();
     });
     $pagination.appendChild(prevGroupButton);
@@ -186,18 +208,7 @@ const renderPagination = () => {
     pageButton.addEventListener("click", async () => {
       currentPage = i;
 
-      const selectedOption = $select.value;
-      const inputValue = $input.value;
-
-      const data =
-        inputValue === ""
-          ? await fetchData(createURL((currentPage - 1) * 10 + 1))
-          : await fetchData(
-              createURL((currentPage - 1) * 10 + 1, selectedOption, inputValue)
-            );
-
-      renderItem(data);
-      renderingMap(document.querySelector(".map"), data);
+      renderForPagination(currentPage);
       renderPagination();
     });
     $pagination.appendChild(pageButton);
@@ -208,6 +219,9 @@ const renderPagination = () => {
     nextGroupButton.className = "fa-solid fa-chevron-right";
     nextGroupButton.addEventListener("click", () => {
       currentGroup++;
+      currentPage = (currentGroup - 1) * pagesPerGroup + 1;
+
+      renderForPagination(currentPage);
       renderPagination();
     });
     $pagination.appendChild(nextGroupButton);
@@ -218,6 +232,9 @@ const searchKeywords = async () => {
   const selectedOption = $select.value;
   const inputValue = $input.value;
 
+  currentPage = 1;
+  currentGroup = 1;
+
   const data = await fetchData(createURL(1, selectedOption, inputValue));
   renderItem(data);
   renderingMap(document.querySelector(".map"), data);
@@ -225,6 +242,10 @@ const searchKeywords = async () => {
 
 const searchCategory = async () => {
   const data = await fetchData(createURL());
+
+  currentPage = 1;
+  currentGroup = 1;
+
   renderItem(data);
   renderingMap(document.querySelector(".map"), data);
 };
