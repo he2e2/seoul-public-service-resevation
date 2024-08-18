@@ -70,6 +70,7 @@ const createMarker = (places, map, clusterer, type) => {
       const mapLink = `https://map.kakao.com/link/map/${place.Y},${place.X}`;
       const content = `
         <div class="overlay">
+          <i class="fa-solid fa-x close-overlay"></i>
           <a href="${mapLink}" target="_blank">
             <img src="${place.IMGURL}" alt="thumbnail" />
             <div>
@@ -87,6 +88,10 @@ const createMarker = (places, map, clusterer, type) => {
         zIndex: 3,
       });
       customOverlay.setMap(map);
+
+      document
+        .querySelector(".close-overlay")
+        .addEventListener("click", () => customOverlay.setMap(null));
     }
 
     return marker;
