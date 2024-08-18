@@ -5,7 +5,9 @@ export const renderingMap = (element, places) => {
   };
 
   const map = new kakao.maps.Map(element, mapOption);
-  createMarker(places, map, "main");
+  const clusterer = createClusterer(map);
+
+  createMarker(places, map, clusterer, "main");
 };
 
 export const renderingDetailMap = (element, place) => {
@@ -15,13 +17,43 @@ export const renderingDetailMap = (element, place) => {
   };
 
   const map = new kakao.maps.Map(element, mapOption);
-  createMarker(place, map, "detail");
+  createMarker(place, map, null, "detail");
 };
 
-const createMarker = (places, map, type) => {
+const createClusterer = (map) => {
+  const clusterer = new kakao.maps.MarkerClusterer({
+    map: map,
+    averageCenter: true,
+    minLevel: 6,
+    disableClickZoom: true,
+    styles: [
+      {
+        width: "50px",
+        height: "50px",
+        background: "rgba(94, 129, 244, 0.7)",
+        borderRadius: "25px",
+        boxShadow: "0 0 10px 5px rgba(94, 129, 244, 0.8)",
+        color: "#323232",
+        textAlign: "center",
+        lineHeight: "50px",
+        fontSize: "1rem",
+        fontWeight: "bold",
+      },
+    ],
+  });
+
+  kakao.maps.event.addListener(clusterer, "clusterclick", (cluster) => {
+    const level = map.getLevel() - 1;
+    map.setLevel(level, { anchor: cluster.getCenter() });
+  });
+
+  return clusterer;
+};
+
+const createMarker = (places, map, clusterer, type) => {
   const imageSrc = "src/assets/img/marker.svg";
 
-  places.map((place) => {
+  const markers = places.map((place) => {
     const imageSize = new kakao.maps.Size(40, 40);
     const imageOffset = new kakao.maps.Point(20, 40);
     const markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, {
@@ -29,7 +61,6 @@ const createMarker = (places, map, type) => {
     });
 
     const marker = new kakao.maps.Marker({
-      map: map,
       position: new kakao.maps.LatLng(place.Y, place.X),
       title: place.PLACENM,
       image: markerImage,
@@ -39,6 +70,7 @@ const createMarker = (places, map, type) => {
       const mapLink = `https://map.kakao.com/link/map/${place.Y},${place.X}`;
       const content = `
         <div class="overlay">
+          <i class="fa-solid fa-x close-overlay"></i>
           <a href="${mapLink}" target="_blank">
             <img src="${place.IMGURL}" alt="thumbnail" />
             <div>
@@ -47,14 +79,27 @@ const createMarker = (places, map, type) => {
             </div>
           </a>
         </div>
-    `;
+      `;
 
       const customOverlay = new kakao.maps.CustomOverlay({
         position: new kakao.maps.LatLng(place.Y, place.X),
         content: content,
         yAnchor: 1,
+        zIndex: 3,
       });
       customOverlay.setMap(map);
+
+      document
+        .querySelector(".close-overlay")
+        .addEventListener("click", () => customOverlay.setMap(null));
     }
+
+    return marker;
   });
+
+  if (clusterer) {
+    clusterer.addMarkers(markers);
+    return;
+  }
+  markers.forEach((marker) => marker.setMap(map));
 };
