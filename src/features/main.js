@@ -59,40 +59,24 @@ const handleDetailClick = async (index) => {
     `http://openapi.seoul.go.kr:8088/${apiKey}/json/ListPublicReservationEducation/${dataIdx}/${dataIdx}/${selectedCategory}/${additionalURL}`
   );
 
-  document.querySelector(".mobile-detail-con").classList.toggle("active");
-
-  document.querySelector(".map").style.height = "calc(100% - 25rem)";
-  document.querySelector(".details").style.display = "flex";
+  toggleDetailView();
 
   renderingDetailMap(document.querySelector(".map"), data);
   renderingDetailMap(document.querySelector(".mobile-map"), data);
 
-  const $reservationBtn = document.querySelectorAll(".reservation");
-  $reservationBtn.forEach((r) => {
+  document.querySelectorAll(".reservation").forEach((r) => {
     r.href = data[0].SVCURL;
   });
 
-  const $contentsCons = document.querySelectorAll(".contents");
-
-  $contentsCons.forEach((con) => {
+  document.querySelectorAll(".contents").forEach((con) => {
     con.innerHTML = data[0].DTLCONT.replace(/<img[^>]*>/g, "");
   });
 };
 
 const renderForPagination = async (currentPage) => {
-  const selectedOption = $select.value;
-  const inputValue = $input.value;
-
-  const data =
-    inputValue === ""
-      ? await fetchData(createURL((currentPage - 1) * postsPerPage + 1))
-      : await fetchData(
-          createURL(
-            (currentPage - 1) * postsPerPage + 1,
-            selectedOption,
-            inputValue
-          )
-        );
+  const data = await fetchData(
+    createURL((currentPage - 1) * postsPerPage + 1, $select.value, $input.value)
+  );
 
   renderItem(data);
   renderingMap(document.querySelector(".map"), data);
@@ -147,65 +131,61 @@ const renderPagination = () => {
   }
 };
 
+const toggleDetailView = () => {
+  document.querySelector(".mobile-detail-con").classList.toggle("active");
+  document.querySelector(".map").style.height = "calc(100% - 25rem)";
+  document.querySelector(".details").style.display = "flex";
+};
+
 // search
 
 const searchKeywords = async () => {
-  const selectedOption = $select.value;
-  const inputValue = $input.value;
-
   currentPage = 1;
   currentGroup = 1;
 
-  const data = await fetchData(createURL(1, selectedOption, inputValue));
+  const data = await fetchData(createURL(1, $select.value, $input.value));
   renderItem(data);
   renderingMap(document.querySelector(".map"), data);
 };
 
-$searchBtn.addEventListener("click", () => {
-  searchKeywords();
-});
+$searchBtn.addEventListener("click", () => searchKeywords);
 
 document.getElementById("search").addEventListener("keydown", (e) => {
-  if (e.key === "Enter" || e.keyCode === 13) {
-    searchKeywords();
-  }
-});
-
-$categories.forEach((category, index) => {
-  category.addEventListener("click", () => {
-    $categories.forEach((cat) => cat.classList.remove("selected"));
-    $mobileCategories.forEach((cat) => cat.classList.remove("selected"));
-
-    category.classList.add("selected");
-    $mobileCategories[index].classList.add("selected");
-    searchCategory();
-  });
+  if (e.key === "Enter" || e.keyCode === 13) searchKeywords();
 });
 
 // category
 
-const searchCategory = async () => {
-  const data = await fetchData(createURL());
+$categories.forEach((category, index) => {
+  category.addEventListener("click", () => handleCategoryClick(index));
+});
 
+$mobileCategories.forEach((category, index) => {
+  category.addEventListener("click", () => handleMobileCategoryClick(index));
+});
+
+const handleCategoryClick = (index) => {
+  $categories.forEach((cat) => cat.classList.remove("selected"));
+  $mobileCategories.forEach((cat) => cat.classList.remove("selected"));
+
+  $categories[index].classList.add("selected");
+  $mobileCategories[index].classList.add("selected");
+  searchCategory();
+};
+
+const handleMobileCategoryClick = (index) => {
+  handleCategoryClick(index);
+  document.querySelector(".mobile-cate").classList.toggle("active");
+};
+
+const searchCategory = async () => {
   currentPage = 1;
   currentGroup = 1;
 
+  const data = await fetchData(createURL());
   renderItem(data);
   renderingMap(document.querySelector(".map"), data);
 };
-
-$mobileCategories.forEach((category, index) => {
-  category.addEventListener("click", () => {
-    $categories.forEach((cat) => cat.classList.remove("selected"));
-    $mobileCategories.forEach((cat) => cat.classList.remove("selected"));
-
-    category.classList.add("selected");
-    $categories[index].classList.add("selected");
-    searchCategory();
-
-    document.querySelector(".mobile-cate").classList.toggle("active");
-  });
-});
 
 document.querySelector(".hamburger").addEventListener("click", () => {
   document.querySelector(".mobile-cate").classList.toggle("active");
