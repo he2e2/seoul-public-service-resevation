@@ -22,6 +22,8 @@ const $searchBtn = document.querySelector(".search-bar button");
 const $categories = document.querySelectorAll(".categories button");
 const $mobileCategories = document.querySelectorAll(".mobile-cate button");
 
+// fetch data
+
 const fetchData = async (url) => {
   const response = await fetch(url);
   const data = await response.json();
@@ -32,6 +34,8 @@ const fetchData = async (url) => {
   totalPages = Math.ceil(totalItems / postsPerPage);
   return data.ListPublicReservationEducation.row;
 };
+
+// render item
 
 const renderItem = async (data) => {
   if (data === "해당하는 데이터가 없습니다.") {
@@ -49,6 +53,8 @@ const renderItem = async (data) => {
     list.addEventListener("click", () => handleDetailClick(index));
   });
 };
+
+// handling item click
 
 const handleDetailClick = async (index) => {
   const dataIdx = (currentPage - 1) * postsPerPage + index + 1;
@@ -73,14 +79,13 @@ const handleDetailClick = async (index) => {
   });
 };
 
-const renderForPagination = async (currentPage) => {
-  const data = await fetchData(
-    createURL((currentPage - 1) * postsPerPage + 1, $select.value, $input.value)
-  );
-
-  renderItem(data);
-  renderingMap(document.querySelector(".map"), data);
+const toggleDetailView = () => {
+  document.querySelector(".mobile-detail-con").classList.toggle("active");
+  document.querySelector(".map").style.height = "calc(100% - 25rem)";
+  document.querySelector(".details").style.display = "flex";
 };
+
+// pagination
 
 const renderPagination = () => {
   if (totalItems <= postsPerPage) return;
@@ -91,50 +96,49 @@ const renderPagination = () => {
   const startPage = (currentGroup - 1) * pagesPerGroup + 1;
   const endPage = Math.min(startPage + pagesPerGroup - 1, totalPages);
 
-  if (currentGroup > 1) {
-    const prevGroupButton = document.createElement("i");
-    prevGroupButton.className = "fa-solid fa-chevron-left";
-    prevGroupButton.addEventListener("click", () => {
-      currentGroup--;
-      currentPage = currentGroup * pagesPerGroup;
-
-      renderForPagination(currentPage);
-      renderPagination();
-    });
-    $pagination.appendChild(prevGroupButton);
-  }
-
-  for (let i = startPage; i <= endPage; i++) {
-    const pageButton = document.createElement("button");
-    pageButton.textContent = i;
-    pageButton.className = i === currentPage ? "on" : "";
-    pageButton.addEventListener("click", async () => {
-      currentPage = i;
-
-      renderForPagination(currentPage);
-      renderPagination();
-    });
-    $pagination.appendChild(pageButton);
-  }
-
-  if (currentGroup * pagesPerGroup < totalPages) {
-    const nextGroupButton = document.createElement("i");
-    nextGroupButton.className = "fa-solid fa-chevron-right";
-    nextGroupButton.addEventListener("click", () => {
-      currentGroup++;
-      currentPage = (currentGroup - 1) * pagesPerGroup + 1;
-
-      renderForPagination(currentPage);
-      renderPagination();
-    });
-    $pagination.appendChild(nextGroupButton);
-  }
+  if (currentGroup > 1) addPaginationButton($pagination, "left");
+  for (let i = startPage; i <= endPage; i++) addPageButton($pagination, i);
+  if (currentGroup * pagesPerGroup < totalPages)
+    addPaginationButton($pagination, "right");
 };
 
-const toggleDetailView = () => {
-  document.querySelector(".mobile-detail-con").classList.toggle("active");
-  document.querySelector(".map").style.height = "calc(100% - 25rem)";
-  document.querySelector(".details").style.display = "flex";
+const renderForPagination = async (page) => {
+  const data = await fetchData(
+    createURL((page - 1) * postsPerPage + 1, $select.value, $input.value)
+  );
+  renderItem(data);
+  renderingMap(document.querySelector(".map"), data);
+};
+
+const addPaginationButton = ($pagination, direction) => {
+  const iconClass = `fa-solid fa-chevron-${direction}`;
+  const button = document.createElement("i");
+  button.className = iconClass;
+  button.addEventListener("click", () => handlePaginationClick(direction));
+  $pagination.appendChild(button);
+};
+
+const addPageButton = ($pagination, pageNumber) => {
+  const pageButton = document.createElement("button");
+  pageButton.textContent = pageNumber;
+  pageButton.className = pageNumber === currentPage ? "on" : "";
+  pageButton.addEventListener("click", () => {
+    currentPage = pageNumber;
+    renderForPagination(currentPage);
+    renderPagination();
+  });
+  $pagination.appendChild(pageButton);
+};
+
+const handlePaginationClick = (direction) => {
+  currentGroup = direction === "left" ? currentGroup - 1 : currentGroup + 1;
+  currentPage =
+    direction === "left"
+      ? pagesPerGroup * currentGroup
+      : (currentGroup - 1) * pagesPerGroup + 1;
+
+  renderForPagination(currentPage);
+  renderPagination();
 };
 
 // search

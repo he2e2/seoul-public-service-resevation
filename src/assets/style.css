@@ -34,7 +34,8 @@ a {
   text-decoration: none;
 }
 
-button {
+button,
+i {
   border: none;
   background: transparent;
   cursor: pointer;
