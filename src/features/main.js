@@ -1,4 +1,5 @@
 import { renderingMap, renderingDetailMap } from "./map.js";
+import { createItem, createURL } from "./create.js";
 
 const apiKey = import.meta.env.VITE_API_KEY;
 
@@ -16,87 +17,15 @@ const $searchBtn = document.querySelector(".search-bar button");
 const $categories = document.querySelectorAll(".categories button");
 const $mobileCategories = document.querySelectorAll(".mobile-cate button");
 
-const createItem = (event) => {
-  let statusClassName = "";
-  if (event.SVCSTATNM === "접수중" || event.SVCSTATNM === "안내중")
-    statusClassName = "blue";
-  else if (event.SVCSTATNM === "예약일시중지") statusClassName = "red";
-  else if (event.SVCSTATNM === "접수종료" || event.SVCSTATNM === "예약마감")
-    statusClassName = "gray";
-
-  return `
-    <div class="list">
-        <div class="status ${statusClassName}">${
-    event.SVCSTATNM === "예약일시중지" ? "일시중지" : event.SVCSTATNM
-  }</div>
-        <img
-        class="thumbnail"
-        src=${event.IMGURL}
-        alt="thumbnail"
-        />
-        <ul class="description">
-        <h3 class="title">
-            ${event.SVCNM}
-        </h3>
-        <div>
-            <li class="item">
-            <img src="src/assets/img/user.svg" alt="user-icon" />
-            <p class="years">${event.USETGTINFO}</p>
-            </li>
-            <li class="item">
-            <img src="src/assets/img/pin.svg" alt="pin-icon" /><span
-                class="period"
-                >${event.SVCOPNBGNDT.split(" ")[0]} ~ ${
-    event.SVCOPNENDDT.split(" ")[0]
-  }</span>
-            </li>
-            <li class="item">
-            <img src="src/assets/img/calendar.svg" alt="calendar-icon" /><span
-                class="place"
-                >${event.PLACENM}</span
-            >
-            </li>
-        </div>
-        </ul>
-    </div>
-    `;
-};
-
-const createURL = (start = 1, option = "%20", keywords = "%20") => {
-  let selectedCategory = document.querySelector(".selected").textContent;
-  selectedCategory =
-    selectedCategory === "전체" ? "%20" : selectedCategory.split("/")[0];
-
-  if (option === "service-name")
-    return `http://openapi.seoul.go.kr:8088/${apiKey}/json/ListPublicReservationEducation/${start}/${
-      start + 9
-    }/${selectedCategory}/${keywords}`;
-  else if (option === "service-person")
-    return `http://openapi.seoul.go.kr:8088/${apiKey}/json/ListPublicReservationEducation/${start}/${
-      start + 9
-    }/${selectedCategory}/%20/${keywords}`;
-  else if (option === "region")
-    return `http://openapi.seoul.go.kr:8088/${apiKey}/json/ListPublicReservationEducation/${start}/${
-      start + 9
-    }/${selectedCategory}/%20/%20/${keywords}`;
-  else
-    return `http://openapi.seoul.go.kr:8088/${apiKey}/json/ListPublicReservationEducation/${start}/${
-      start + 9
-    }/${selectedCategory}`;
-};
-
 const fetchData = async (url) => {
-  return await fetch(url)
-    .then((res) => res.json())
-    .then((data) => {
-      if (data.RESULT) return data.RESULT.MESSAGE;
+  const response = await fetch(url);
+  const data = await response.json();
 
-      data = data.ListPublicReservationEducation;
-      totalItems = data.list_total_count;
-      totalPages = Math.ceil(totalItems / postsPerPage);
+  if (data.RESULT) return data.RESULT.MESSAGE;
 
-      return data.row;
-    });
+  totalItems = data.ListPublicReservationEducation.list_total_count;
+  totalPages = Math.ceil(totalItems / postsPerPage);
+  return data.ListPublicReservationEducation.row;
 };
 
 const renderItem = async (data) => {
@@ -106,10 +35,8 @@ const renderItem = async (data) => {
   }
 
   const $listWrapper = document.querySelector(".list-wrapper");
-  $listWrapper.innerHTML = "";
+  $listWrapper.innerHTML = data.map(createItem).join("");
 
-  const itemHtml = data.map((row) => createItem(row)).join("");
-  $listWrapper.innerHTML = itemHtml;
   renderPagination();
 
   // add details
