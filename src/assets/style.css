@@ -445,7 +445,7 @@ main {
 
 .overlay {
   z-index: 9999;
-  width: 20rem;
+  width: 18rem;
   height: 14rem;
 
   background-color: white;
