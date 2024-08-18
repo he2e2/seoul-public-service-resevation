@@ -52,27 +52,40 @@ export const createItem = (event) => {
       `;
 };
 
+export const getSelectedCategory = () => {
+  let selectedCategory = document.querySelector(".selected").textContent;
+  return selectedCategory === "전체" ? "%20" : selectedCategory.split("/")[0];
+};
+
+export const getAdditionalURL = () => {
+  const selectedOption = document.getElementById("search-type").value;
+  const inputValue = document.getElementById("search").value;
+
+  const urls = {
+    "service-name": `${inputValue}/`,
+    "service-person": `%20/${inputValue}/`,
+    "region": `%20/%20/${inputValue}/`,
+    "default": "",
+  };
+
+  return urls[selectedOption] || urls["default"];
+};
+
 export const createURL = (start = 1, option = "%20", keywords = "%20") => {
   const apiKey = import.meta.env.VITE_API_KEY;
 
-  let selectedCategory = document.querySelector(".selected").textContent;
-  selectedCategory =
-    selectedCategory === "전체" ? "%20" : selectedCategory.split("/")[0];
+  const selectedCategory = getSelectedCategory();
 
-  if (option === "service-name")
-    return `http://openapi.seoul.go.kr:8088/${apiKey}/json/ListPublicReservationEducation/${start}/${
-      start + 9
-    }/${selectedCategory}/${keywords}`;
-  else if (option === "service-person")
-    return `http://openapi.seoul.go.kr:8088/${apiKey}/json/ListPublicReservationEducation/${start}/${
-      start + 9
-    }/${selectedCategory}/%20/${keywords}`;
-  else if (option === "region")
-    return `http://openapi.seoul.go.kr:8088/${apiKey}/json/ListPublicReservationEducation/${start}/${
-      start + 9
-    }/${selectedCategory}/%20/%20/${keywords}`;
-  else
-    return `http://openapi.seoul.go.kr:8088/${apiKey}/json/ListPublicReservationEducation/${start}/${
-      start + 9
-    }/${selectedCategory}`;
+  const urls = {
+    "service-name": `${selectedCategory}/${keywords}`,
+    "service-person": `${selectedCategory}/%20/${keywords}`,
+    "region": `${selectedCategory}/%20/%20/${keywords}`,
+    "default": selectedCategory,
+  };
+
+  const urlPath = urls[option] || urls["default"];
+
+  return `http://openapi.seoul.go.kr:8088/${apiKey}/json/ListPublicReservationEducation/${start}/${
+    start + 9
+  }/${urlPath}`;
 };

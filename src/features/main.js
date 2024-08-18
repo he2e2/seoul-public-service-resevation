@@ -1,5 +1,10 @@
 import { renderingMap, renderingDetailMap } from "./map.js";
-import { createItem, createURL } from "./create.js";
+import {
+  createItem,
+  createURL,
+  getSelectedCategory,
+  getAdditionalURL,
+} from "./create.js";
 
 const apiKey = import.meta.env.VITE_API_KEY;
 
@@ -39,51 +44,38 @@ const renderItem = async (data) => {
 
   renderPagination();
 
-  // add details
   const $lists = document.querySelectorAll(".list");
   $lists.forEach((list, index) => {
-    list.addEventListener("click", async () => {
-      const dataIdx = (currentPage - 1) * postsPerPage + index + 1;
+    list.addEventListener("click", () => handleDetailClick(index));
+  });
+};
 
-      let selectedCategory = document.querySelector(".selected").textContent;
-      selectedCategory =
-        selectedCategory === "전체" ? "%20" : selectedCategory.split("/")[0];
+const handleDetailClick = async (index) => {
+  const dataIdx = (currentPage - 1) * postsPerPage + index + 1;
+  const selectedCategory = getSelectedCategory();
+  const additionalURL = getAdditionalURL();
 
-      const selectedOption = $select.value;
-      const inputValue = $input.value;
+  const data = await fetchData(
+    `http://openapi.seoul.go.kr:8088/${apiKey}/json/ListPublicReservationEducation/${dataIdx}/${dataIdx}/${selectedCategory}/${additionalURL}`
+  );
 
-      let additionalURL = "";
-      if (inputValue !== "") {
-        if (selectedOption === "service-name") additionalURL = `${inputValue}/`;
-        else if (selectedOption === "service-person")
-          additionalURL = `%20/${inputValue}/`;
-        else if (selectedOption === "region")
-          additionalURL = `%20/%20/${inputValue}/`;
-      }
+  document.querySelector(".mobile-detail-con").classList.toggle("active");
 
-      const data = await fetchData(
-        `http://openapi.seoul.go.kr:8088/${apiKey}/json/ListPublicReservationEducation/${dataIdx}/${dataIdx}/${selectedCategory}/${additionalURL}`
-      );
+  document.querySelector(".map").style.height = "calc(100% - 25rem)";
+  document.querySelector(".details").style.display = "flex";
 
-      document.querySelector(".mobile-detail-con").classList.toggle("active");
+  renderingDetailMap(document.querySelector(".map"), data);
+  renderingDetailMap(document.querySelector(".mobile-map"), data);
 
-      document.querySelector(".map").style.height = "calc(100% - 25rem)";
-      document.querySelector(".details").style.display = "flex";
+  const $reservationBtn = document.querySelectorAll(".reservation");
+  $reservationBtn.forEach((r) => {
+    r.href = data[0].SVCURL;
+  });
 
-      renderingDetailMap(document.querySelector(".map"), data);
-      renderingDetailMap(document.querySelector(".mobile-map"), data);
+  const $contentsCons = document.querySelectorAll(".contents");
 
-      const $reservationBtn = document.querySelectorAll(".reservation");
-      $reservationBtn.forEach((r) => {
-        r.href = data[0].SVCURL;
-      });
-
-      const $contentsCons = document.querySelectorAll(".contents");
-
-      $contentsCons.forEach((con) => {
-        con.innerHTML = data[0].DTLCONT.replace(/<img[^>]*>/g, "");
-      });
-    });
+  $contentsCons.forEach((con) => {
+    con.innerHTML = data[0].DTLCONT.replace(/<img[^>]*>/g, "");
   });
 };
 
@@ -155,6 +147,8 @@ const renderPagination = () => {
   }
 };
 
+// search
+
 const searchKeywords = async () => {
   const selectedOption = $select.value;
   const inputValue = $input.value;
@@ -163,16 +157,6 @@ const searchKeywords = async () => {
   currentGroup = 1;
 
   const data = await fetchData(createURL(1, selectedOption, inputValue));
-  renderItem(data);
-  renderingMap(document.querySelector(".map"), data);
-};
-
-const searchCategory = async () => {
-  const data = await fetchData(createURL());
-
-  currentPage = 1;
-  currentGroup = 1;
-
   renderItem(data);
   renderingMap(document.querySelector(".map"), data);
 };
@@ -197,6 +181,18 @@ $categories.forEach((category, index) => {
     searchCategory();
   });
 });
+
+// category
+
+const searchCategory = async () => {
+  const data = await fetchData(createURL());
+
+  currentPage = 1;
+  currentGroup = 1;
+
+  renderItem(data);
+  renderingMap(document.querySelector(".map"), data);
+};
 
 $mobileCategories.forEach((category, index) => {
   category.addEventListener("click", () => {
@@ -224,6 +220,8 @@ document
   .addEventListener("click", () => {
     document.querySelector(".mobile-detail-con").classList.toggle("active");
   });
+
+// init
 
 const init = async () => {
   const data = await fetchData(createURL());
