@@ -1,5 +1,5 @@
 @media (max-width: 90rem) {
-  .mobile-cate {
+  .categories {
     opacity: 0;
     visibility: hidden;
     transition: 0.3s ease;
@@ -43,6 +43,7 @@
     }
 
     .fa-x {
+      display: block;
       color: var(--primary-blue);
       position: fixed;
       top: 2rem;
