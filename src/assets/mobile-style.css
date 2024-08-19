@@ -155,7 +155,7 @@
     background-color: var(--primary-blue);
   }
 
-  .fa-x {
+  .detail-con-close {
     position: absolute;
     color: var(--primary-blue);
     top: 2rem;

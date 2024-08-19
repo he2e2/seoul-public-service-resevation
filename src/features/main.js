@@ -57,6 +57,7 @@ const renderItem = async (data) => {
 // handling item click
 
 const handleDetailClick = async (index) => {
+  console.log("hi");
   const dataIdx = (currentPage - 1) * postsPerPage + index + 1;
   const selectedCategory = getSelectedCategory();
   const additionalURL = getAdditionalURL();
@@ -199,11 +200,9 @@ document.querySelector(".mobile-cate .fa-x").addEventListener("click", () => {
   document.querySelector(".mobile-cate").classList.toggle("active");
 });
 
-document
-  .querySelector(".mobile-detail-con .fa-x")
-  .addEventListener("click", () => {
-    document.querySelector(".mobile-detail-con").classList.toggle("active");
-  });
+document.querySelector(".detail-con-close").addEventListener("click", () => {
+  document.querySelector(".mobile-detail-con").classList.toggle("active");
+});
 
 // init
 

@@ -87,11 +87,17 @@ const createMarker = (places, map, clusterer, type) => {
         yAnchor: 1,
         zIndex: 3,
       });
+
       customOverlay.setMap(map);
 
-      document
-        .querySelector(".close-overlay")
-        .addEventListener("click", () => customOverlay.setMap(null));
+      setTimeout(() => {
+        const $closeBtn = document.querySelector(".close-overlay");
+        if ($closeBtn) {
+          $closeBtn.addEventListener("click", () => {
+            customOverlay.setMap(null);
+          });
+        }
+      }, 0);
     }
 
     return marker;
