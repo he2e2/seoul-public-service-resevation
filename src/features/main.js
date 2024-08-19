@@ -1,12 +1,5 @@
 import { renderingMap, renderingDetailMap } from "./map.js";
-import {
-  createItem,
-  createURL,
-  getSelectedCategory,
-  getAdditionalURL,
-} from "./create.js";
-
-const apiKey = import.meta.env.VITE_API_KEY;
+import { createItem, createURL } from "./create.js";
 
 const postsPerPage = 10;
 const pagesPerGroup = 5;
@@ -62,11 +55,9 @@ const renderItem = async (data) => {
 
 const handleDetailClick = async (index) => {
   const dataIdx = (currentPage - 1) * postsPerPage + index + 1;
-  const selectedCategory = getSelectedCategory();
-  const additionalURL = getAdditionalURL();
 
   const data = await fetchData(
-    `http://openapi.seoul.go.kr:8088/${apiKey}/json/ListPublicReservationEducation/${dataIdx}/${dataIdx}/${selectedCategory}/${additionalURL}`
+    createURL(dataIdx, $select.value, $input.value, true)
   );
 
   toggleDetailView();
