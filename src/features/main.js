@@ -173,6 +173,7 @@ $categories.forEach((category, index) => {
 const handleCategoryClick = (index) => {
   $categories.forEach((cat) => cat.classList.remove("selected"));
   $categories[index].classList.add("selected");
+  document.querySelector(".categories").classList.toggle("active");
 
   $input.value = "";
   searchCategory();
