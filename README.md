@@ -2,8 +2,8 @@
 
 서울의 교육 공공 서비스 예약을 위한 반응형 웹 애플리케이션입니다.
 
-<img src="https://github.com/user-attachments/assets/ddabf7a3-d63d-41d2-a2b8-64ac93eebbf4" width="40%" /> 
-<img src="https://github.com/user-attachments/assets/007a40b8-18a7-44a2-ab50-47840a0c2320" width="40%" />
+<img src="https://github.com/user-attachments/assets/92969ea8-4523-4bd4-b306-dd5adab4ace8" width="40%" /> 
+<img src="https://github.com/user-attachments/assets/bf4c2dde-7dcc-4a55-aead-5a18cd103c5d" width="40%" />
 
 ### 목차
 
@@ -22,9 +22,9 @@
 
 ### ✨기능
 
-- **서울시 교육 공공서비스예약 정보**: `서울시 교육 공공서비스예약 정보 API`를 사용하여 현재 [공공 서비스 예약](http://yeyak.seoul.go.kr)에 있는 예약 정보를 사용자에게 제공.
-- **동적 지도 통합**: `Kakao Maps API`를 사용하여 지도와 마커, 오버레이 표시.
-- **반응형 디자인**: 다양한 장치에서 호환성 보장.
+- **서울시 교육 공공서비스예약 정보**: `서울시 교육 공공서비스예약 정보 API`를 사용하여 현재 [공공 서비스 예약](http://yeyak.seoul.go.kr)에 있는 예약 정보를 사용자에게 제공합니다.
+- **동적 지도 통합**: `Kakao Maps API`를 사용하여 지도와 마커, 오버레이를 통해 지도 정보를 제공합니다.
+- **반응형 디자인**: 다양한 장치에서 호환성 보장합니다.
 
 ### 🛠️설치 방법
 
@@ -77,5 +77,4 @@ npm run dev
 
 ### 🔥개선할 점
 
-- **활성화된 검색 요소 태그**: 카테고리나 검색어 중 활성화된 요소를 태그 형식으로 화면에 추가해 좀 더 직관적인 UI/UX를 구현하고자 한다.
-- **접수중인 프로그램만 보기**: 접수중인 프로그램만 볼 수 있는 필터를 추가하고자 한다.
+- **활성화된 검색 요소 태그**: 카테고리나 검색어 중 활성화된 요소를 태그 형식으로 화면에 추가해 좀 더 직관적인 UI/UX를 구현하고자 합니다.
