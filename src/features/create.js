@@ -6,9 +6,8 @@ const statusClassNames = {
   예약마감: "gray",
 };
 
-const formatDateRange = (start, end) => {
-  return `${start.split(" ")[0]} ~ ${end.split(" ")[0]}`;
-};
+const noImageUrl =
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT2BNGImiFNXoEc3ONE3biDks4T4Y9JkCJCMA&s";
 
 export const createItem = (event) => {
   const statusClassName = statusClassNames[event.SVCSTATNM] || "";
@@ -20,7 +19,7 @@ export const createItem = (event) => {
   }</div>
           <img
           class="thumbnail"
-          src=${event.IMGURL}
+          src=${event.IMGURL || noImageUrl}
           alt="thumbnail"
           />
           <ul class="description">
@@ -52,26 +51,12 @@ export const createItem = (event) => {
       `;
 };
 
-export const getSelectedCategory = () => {
-  let selectedCategory = document.querySelector(".selected").textContent;
-  return selectedCategory === "전체" ? "%20" : selectedCategory.split("/")[0];
-};
-
-export const getAdditionalURL = () => {
-  const selectedOption = document.getElementById("search-type").value;
-  const inputValue = document.getElementById("search").value;
-
-  const urls = {
-    "service-name": `${inputValue}/`,
-    "service-person": `%20/${inputValue}/`,
-    "region": `%20/%20/${inputValue}/`,
-    "default": "",
-  };
-
-  return urls[selectedOption] || urls["default"];
-};
-
-export const createURL = (start = 1, option = "%20", keywords = "%20") => {
+export const createURL = (
+  start = 1,
+  option = "%20",
+  keywords = "%20",
+  detail = false
+) => {
   const apiKey = import.meta.env.VITE_API_KEY;
 
   const selectedCategory = getSelectedCategory();
@@ -85,7 +70,19 @@ export const createURL = (start = 1, option = "%20", keywords = "%20") => {
 
   const urlPath = urls[option] || urls["default"];
 
+  if (detail)
+    return `http://openapi.seoul.go.kr:8088/${apiKey}/json/ListPublicReservationEducation/${start}/${start}/${urlPath}`;
+
   return `http://openapi.seoul.go.kr:8088/${apiKey}/json/ListPublicReservationEducation/${start}/${
     start + 9
   }/${urlPath}`;
+};
+
+const formatDateRange = (start, end) => {
+  return `${start.split(" ")[0]} ~ ${end.split(" ")[0]}`;
+};
+
+const getSelectedCategory = () => {
+  let selectedCategory = document.querySelector(".selected").textContent;
+  return selectedCategory === "전체" ? "%20" : selectedCategory.split("/")[0];
 };

@@ -1,12 +1,5 @@
-import { renderingMap, renderingDetailMap } from "./map.js";
-import {
-  createItem,
-  createURL,
-  getSelectedCategory,
-  getAdditionalURL,
-} from "./create.js";
-
-const apiKey = import.meta.env.VITE_API_KEY;
+import { renderingMap } from "./map.js";
+import { createItem, createURL } from "./create.js";
 
 const postsPerPage = 10;
 const pagesPerGroup = 5;
@@ -20,25 +13,29 @@ const $select = document.getElementById("search-type");
 const $input = document.getElementById("search");
 const $searchBtn = document.querySelector(".search-bar button");
 const $categories = document.querySelectorAll(".categories button");
-const $mobileCategories = document.querySelectorAll(".mobile-cate button");
 
-// fetch data
+// fetching data
 
 const fetchData = async (url) => {
-  const response = await fetch(url);
-  const data = await response.json();
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
 
-  if (data.RESULT) return data.RESULT.MESSAGE;
+    if (data.RESULT) return data.RESULT.MESSAGE;
 
-  totalItems = data.ListPublicReservationEducation.list_total_count;
-  totalPages = Math.ceil(totalItems / postsPerPage);
-  return data.ListPublicReservationEducation.row;
+    totalItems = data.ListPublicReservationEducation.list_total_count;
+    totalPages = Math.ceil(totalItems / postsPerPage);
+    return data.ListPublicReservationEducation.row;
+  } catch (e) {
+    console.error(e);
+  }
 };
 
-// render item
+// rendering data
 
 const renderItem = async (data) => {
   if (data === "해당하는 데이터가 없습니다.") {
+    $input.value = "";
     window.alert(data);
     return;
   }
@@ -54,21 +51,31 @@ const renderItem = async (data) => {
   });
 };
 
-// handling item click
+// handling list item click
 
 const handleDetailClick = async (index) => {
   const dataIdx = (currentPage - 1) * postsPerPage + index + 1;
-  const selectedCategory = getSelectedCategory();
-  const additionalURL = getAdditionalURL();
 
   const data = await fetchData(
-    `http://openapi.seoul.go.kr:8088/${apiKey}/json/ListPublicReservationEducation/${dataIdx}/${dataIdx}/${selectedCategory}/${additionalURL}`
+    createURL(dataIdx, $select.value, $input.value, true)
   );
 
   toggleDetailView();
 
-  renderingDetailMap(document.querySelector(".map"), data);
-  renderingDetailMap(document.querySelector(".mobile-map"), data);
+  renderingMap(
+    document.querySelector(".map"),
+    data,
+    data[0].X,
+    data[0].Y,
+    "detail"
+  );
+  renderingMap(
+    document.querySelector(".mobile-map"),
+    data,
+    data[0].X,
+    data[0].Y,
+    "detail"
+  );
 
   document.querySelectorAll(".reservation").forEach((r) => {
     r.href = data[0].SVCURL;
@@ -83,12 +90,19 @@ const toggleDetailView = () => {
   document.querySelector(".mobile-detail-con").classList.toggle("active");
   document.querySelector(".map").style.height = "calc(100% - 25rem)";
   document.querySelector(".details").style.display = "flex";
+
+  document.querySelector(".map").innerHTML = "";
+  document.querySelector(".mobile-map").innerHTML = "";
 };
 
 // pagination
 
 const renderPagination = () => {
-  if (totalItems <= postsPerPage) return;
+  if (totalItems <= postsPerPage) {
+    const $pagination = document.querySelector(".pagination");
+    $pagination.innerHTML = "";
+    return;
+  }
 
   const $pagination = document.querySelector(".pagination");
   $pagination.innerHTML = "";
@@ -152,7 +166,9 @@ const searchKeywords = async () => {
   renderingMap(document.querySelector(".map"), data);
 };
 
-$searchBtn.addEventListener("click", () => searchKeywords);
+$searchBtn.addEventListener("click", () => {
+  searchKeywords();
+});
 
 document.getElementById("search").addEventListener("keydown", (e) => {
   if (e.key === "Enter" || e.keyCode === 13) searchKeywords();
@@ -161,25 +177,18 @@ document.getElementById("search").addEventListener("keydown", (e) => {
 // category
 
 $categories.forEach((category, index) => {
-  category.addEventListener("click", () => handleCategoryClick(index));
-});
-
-$mobileCategories.forEach((category, index) => {
-  category.addEventListener("click", () => handleMobileCategoryClick(index));
+  category.addEventListener("click", () => {
+    handleCategoryClick(index);
+  });
 });
 
 const handleCategoryClick = (index) => {
   $categories.forEach((cat) => cat.classList.remove("selected"));
-  $mobileCategories.forEach((cat) => cat.classList.remove("selected"));
-
   $categories[index].classList.add("selected");
-  $mobileCategories[index].classList.add("selected");
-  searchCategory();
-};
+  document.querySelector(".categories").classList.toggle("active");
 
-const handleMobileCategoryClick = (index) => {
-  handleCategoryClick(index);
-  document.querySelector(".mobile-cate").classList.toggle("active");
+  $input.value = "";
+  searchCategory();
 };
 
 const searchCategory = async () => {
@@ -192,18 +201,16 @@ const searchCategory = async () => {
 };
 
 document.querySelector(".hamburger").addEventListener("click", () => {
-  document.querySelector(".mobile-cate").classList.toggle("active");
+  document.querySelector(".categories").classList.toggle("active");
 });
 
-document.querySelector(".mobile-cate .fa-x").addEventListener("click", () => {
-  document.querySelector(".mobile-cate").classList.toggle("active");
+document.querySelector(".categories .fa-x").addEventListener("click", () => {
+  document.querySelector(".categories").classList.toggle("active");
 });
 
-document
-  .querySelector(".mobile-detail-con .fa-x")
-  .addEventListener("click", () => {
-    document.querySelector(".mobile-detail-con").classList.toggle("active");
-  });
+document.querySelector(".detail-con-close").addEventListener("click", () => {
+  document.querySelector(".mobile-detail-con").classList.toggle("active");
+});
 
 // init
 
