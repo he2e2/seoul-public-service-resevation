@@ -9,10 +9,6 @@ const statusClassNames = {
 const noImageUrl =
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT2BNGImiFNXoEc3ONE3biDks4T4Y9JkCJCMA&s";
 
-const formatDateRange = (start, end) => {
-  return `${start.split(" ")[0]} ~ ${end.split(" ")[0]}`;
-};
-
 export const createItem = (event) => {
   const statusClassName = statusClassNames[event.SVCSTATNM] || "";
 
@@ -55,11 +51,6 @@ export const createItem = (event) => {
       `;
 };
 
-const getSelectedCategory = () => {
-  let selectedCategory = document.querySelector(".selected").textContent;
-  return selectedCategory === "전체" ? "%20" : selectedCategory.split("/")[0];
-};
-
 export const createURL = (
   start = 1,
   option = "%20",
@@ -85,4 +76,13 @@ export const createURL = (
   return `http://openapi.seoul.go.kr:8088/${apiKey}/json/ListPublicReservationEducation/${start}/${
     start + 9
   }/${urlPath}`;
+};
+
+const formatDateRange = (start, end) => {
+  return `${start.split(" ")[0]} ~ ${end.split(" ")[0]}`;
+};
+
+const getSelectedCategory = () => {
+  let selectedCategory = document.querySelector(".selected").textContent;
+  return selectedCategory === "전체" ? "%20" : selectedCategory.split("/")[0];
 };

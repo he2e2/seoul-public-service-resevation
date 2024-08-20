@@ -1,4 +1,4 @@
-import { renderingMap, renderingDetailMap } from "./map.js";
+import { renderingMap } from "./map.js";
 import { createItem, createURL } from "./create.js";
 
 const postsPerPage = 10;
@@ -14,7 +14,7 @@ const $input = document.getElementById("search");
 const $searchBtn = document.querySelector(".search-bar button");
 const $categories = document.querySelectorAll(".categories button");
 
-// fetch data
+// fetching data
 
 const fetchData = async (url) => {
   try {
@@ -31,7 +31,7 @@ const fetchData = async (url) => {
   }
 };
 
-// render item
+// rendering data
 
 const renderItem = async (data) => {
   if (data === "해당하는 데이터가 없습니다.") {
@@ -51,7 +51,7 @@ const renderItem = async (data) => {
   });
 };
 
-// handling item click
+// handling list item click
 
 const handleDetailClick = async (index) => {
   const dataIdx = (currentPage - 1) * postsPerPage + index + 1;
@@ -62,8 +62,20 @@ const handleDetailClick = async (index) => {
 
   toggleDetailView();
 
-  renderingDetailMap(document.querySelector(".map"), data);
-  renderingDetailMap(document.querySelector(".mobile-map"), data);
+  renderingMap(
+    document.querySelector(".map"),
+    data,
+    data[0].X,
+    data[0].Y,
+    "detail"
+  );
+  renderingMap(
+    document.querySelector(".mobile-map"),
+    data,
+    data[0].X,
+    data[0].Y,
+    "detail"
+  );
 
   document.querySelectorAll(".reservation").forEach((r) => {
     r.href = data[0].SVCURL;
