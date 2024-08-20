@@ -89,11 +89,16 @@ header {
 
   nav {
     display: flex;
+    align-items: center;
     gap: 1rem;
 
     @media (max-width: 90rem) {
       display: none;
     }
+  }
+
+  .fa-x {
+    display: none;
   }
 
   button {
